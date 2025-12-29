@@ -4,41 +4,31 @@ import pandas as pd
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import seaborn as sns
-import folium
-from streamlit_folium import st_folium
 
 st.set_page_config(page_title="Reservoir Sedimentation Demo", layout="wide")
 st.title("Reservoir Sedimentation Visualization Demo ")
 
-# =========================================================
-# 3D Reservoir Surface Simulation
-# =========================================================
 st.subheader("3D Reservoir Sedimentation Over Time (Interactive)")
 
-# Simulated reservoir grid
 nx, ny = 50, 50
 x = np.linspace(0, 100, nx)
 y = np.linspace(0, 50, ny)
 X, Y = np.meshgrid(x, y)
 
-# Initial reservoir shape
 Z_initial = 20 * np.exp(-((X - 50)**2 + (Y - 25)**2) / 200)
 
-# Years & sedimentation
 years = list(range(2000, 2025))
-sedimentation_rate = 0.3  # % per year
+sedimentation_rate = 0.3
 Z_all_years = []
 for i, year in enumerate(years):
     loss_factor = (1 - sedimentation_rate * i / 100)
     Z_all_years.append(Z_initial * loss_factor)
 Z_all_years = np.array(Z_all_years)
 
-# Slider to select year
 selected_year = st.slider("Select Year", min_value=years[0], max_value=years[-1], value=years[0])
 year_index = selected_year - years[0]
 Z_current = Z_all_years[year_index]
 
-# 3D Surface Plot
 fig_3d = go.Figure(data=[go.Surface(
     z=Z_current,
     x=X,
@@ -60,7 +50,6 @@ fig_3d.update_layout(
 )
 st.plotly_chart(fig_3d, use_container_width=True)
 
-# Metrics for current year
 total_initial = np.sum(Z_initial)
 total_current = np.sum(Z_current)
 cumulative_loss = (1 - total_current / total_initial) * 100
@@ -70,29 +59,19 @@ c1, c2 = st.columns(2)
 c1.metric("Cumulative Loss (%)", f"{cumulative_loss:.2f}")
 c2.metric("Remaining Volume (%)", f"{100 - cumulative_loss:.2f}")
 
-# =========================================================
-# Static Demo Parameters
-# =========================================================
 st.subheader("Static Reservoir Sedimentation Demo")
 reservoir_name = "Lake Demo"
-lat_demo, lon_demo = 35.0, -120.0
 years_static = list(range(2000, 2025))
 sedimentation_rate_static = 0.3
 cumulative_loss_static = [sedimentation_rate_static * (y - years_static[0]) for y in years_static]
 remaining_capacity_static = [100 - cl for cl in cumulative_loss_static]
 
-# -------------------------------
-# Static Metrics Display
-# -------------------------------
 st.subheader("Sedimentation Metrics (Example)")
 c1, c2, c3 = st.columns(3)
 c1.metric("Sedimentation Rate (%/year)", f"{sedimentation_rate_static:.2f}")
 c2.metric("Cumulative Capacity Loss (%)", f"{cumulative_loss_static[-1]:.2f}")
 c3.metric("Remaining Capacity (million m³)", f"{remaining_capacity_static[-1]:.2f}")
 
-# -------------------------------
-# 2D Plots
-# -------------------------------
 sns.set_style("darkgrid")
 
 st.subheader("Cumulative Capacity Loss Over Time")
@@ -111,24 +90,6 @@ ax2.set_ylabel("Remaining Capacity (million m³)")
 ax2.set_title(f"{reservoir_name} Remaining Capacity Over Time")
 st.pyplot(fig2)
 
-# -------------------------------
-# Map Visualization
-# -------------------------------
-st.subheader("Reservoir Location Map")
-m = folium.Map(location=[lat_demo, lon_demo], zoom_start=6, control_scale=True)
-folium.CircleMarker(
-    location=[lat_demo, lon_demo],
-    radius=10,
-    color="red",
-    fill=True,
-    fill_color="orange",
-    popup=f"{reservoir_name}\nSed Rate: {sedimentation_rate_static:.2f}%/yr"
-).add_to(m)
-st_folium(m, width=900, height=500)
-
-# -------------------------------
-# Example Sedimentation Table
-# -------------------------------
 st.subheader("Sedimentation Data Table (Example)")
 df_demo = pd.DataFrame({
     "Year": years_static,
