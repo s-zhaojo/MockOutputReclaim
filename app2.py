@@ -8,7 +8,7 @@ import folium
 from streamlit_folium import st_folium
 
 st.set_page_config(page_title="Reservoir Sedimentation Demo", layout="wide")
-st.title("Reservoir Sedimentation Visualization Demo 🌊🏞️")
+st.title("Reservoir Sedimentation Visualization Demo ")
 
 # =========================================================
 # 3D Reservoir Surface Simulation
