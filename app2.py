@@ -4,9 +4,11 @@ import pandas as pd
 import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import seaborn as sns
+import folium
+from streamlit_folium import st_folium
 
 st.set_page_config(page_title="Reservoir Sedimentation Demo", layout="wide")
-st.title("Reservoir Sedimentation Visualization Demo ")
+st.title("Reservoir Sedimentation Visualization Demo")
 
 st.subheader("3D Reservoir Sedimentation Over Time (Interactive)")
 
@@ -61,6 +63,7 @@ c2.metric("Remaining Volume (%)", f"{100 - cumulative_loss:.2f}")
 
 st.subheader("Static Reservoir Sedimentation Demo")
 reservoir_name = "Lake Demo"
+lat_demo, lon_demo = 35.0, -120.0
 years_static = list(range(2000, 2025))
 sedimentation_rate_static = 0.3
 cumulative_loss_static = [sedimentation_rate_static * (y - years_static[0]) for y in years_static]
